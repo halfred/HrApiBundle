@@ -1,0 +1,19 @@
+{
+    "name": "hr/api",
+    "description": "description",
+    "license": "license",
+    "keywords": [
+        "keywords"
+    ],
+    "homepage": "https://github.com/zendframework/zend-code",
+    "type": "symfony-bundle",
+    "autoload": {
+        "psr-4": {
+            "HR\\ApiBundle\\": "."
+        }
+    },
+    "require": {
+    },
+    "require-dev": {
+    }
+}
