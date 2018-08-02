@@ -1,11 +1,9 @@
 <?php
 
-
 namespace Hr\ApiBundle;
 
-class HrApiBundle {
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-    public function getName() {
-        return 'HrApiBundle';
-    }
+class HrApiBundle extends Bundle {
+
 }
