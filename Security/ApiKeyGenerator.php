@@ -4,6 +4,7 @@ namespace Hr\ApiBundle\Security;
 
 use Hr\ApiBundle\Entity\User;
 use Hr\ApiBundle\Interfaces\CacheManagerInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -29,14 +30,14 @@ class ApiKeyGenerator
     protected $cacheManager;
 
     /**
-     * @param EntityManagerInterface       $entityManager
+     * @param EntityManagerInterface $entityManager
      * @param UserPasswordEncoderInterface $userPasswordEncoder
-     * @param CacheManagerInterface        $cacheManager
+     * @param CacheItemPoolInterface $cacheManager
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         UserPasswordEncoderInterface $userPasswordEncoder,
-        CacheManagerInterface $cacheManager
+        CacheItemPoolInterface $cacheManager
     ) {
         $this->entityManager       = $entityManager;
         $this->userPasswordEncoder = $userPasswordEncoder;
