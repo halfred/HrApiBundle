@@ -11,6 +11,8 @@ services:
     public: true
   Hr\ApiBundle\Security\ApiKeyAuthenticator:
     public: true
+  Hr\ApiBundle\Security\ApiKeyGenerator:
+    public: true
   Hr\ApiBundle\Security\ApiKeyUserProvider:
     public: true
   Hr\ApiBundle\Service\CacheManager\RedisCache:

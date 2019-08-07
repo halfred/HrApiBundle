@@ -2,8 +2,8 @@
 
 namespace Hr\ApiBundle\Security;
 
-use App\Entity\User;
-use App\Interfaces\CacheManagerInterface;
+use Hr\ApiBundle\Entity\User;
+use Hr\ApiBundle\Interfaces\CacheManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
