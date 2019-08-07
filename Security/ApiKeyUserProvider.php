@@ -2,8 +2,8 @@
 
 namespace Hr\ApiBundle\Security;
 
-use App\Entity\User as UserEntity;
 use Doctrine\ORM\EntityManagerInterface;
+use Hr\ApiBundle\Entity\User as UserEntity;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;

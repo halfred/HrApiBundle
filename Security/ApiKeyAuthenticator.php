@@ -2,8 +2,9 @@
 
 namespace Hr\ApiBundle\Security;
 
-use App\Interfaces\CacheManagerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
@@ -30,19 +31,19 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
      */
     protected $userPasswordEncoder;
     /**
-     * @var CacheManagerInterface The cache manager service
+     * @var CacheItemPoolInterface The cache manager service
      */
     protected $cacheManager;
 
     /**
      * @param EntityManagerInterface       $entityManager
      * @param UserPasswordEncoderInterface $userPasswordEncoder
-     * @param CacheManagerInterface        $cacheManager
+     * @param CacheItemPoolInterface $cacheManager
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         UserPasswordEncoderInterface $userPasswordEncoder,
-        CacheManagerInterface $cacheManager
+        CacheItemPoolInterface $cacheManager
     ) {
         $this->entityManager       = $entityManager;
         $this->userPasswordEncoder = $userPasswordEncoder;
@@ -94,7 +95,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
         $providerKey
     ): PreAuthenticatedToken {
         if (!$userProvider instanceof ApiKeyUserProvider) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'The user provider must be an instance of ApiKeyUserProvider (' . get_class($userProvider) . ' was given).'
             );
         }
