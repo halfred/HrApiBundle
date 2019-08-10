@@ -97,4 +97,10 @@ class User implements UserInterface
     public function eraseCredentials()
     {
     }
+
+    public function addRoles(array $roles)
+    {
+        $this->roles = array_merge($this->roles, $roles);
+        $this->roles = array_unique($this->roles);
+    }
 }
