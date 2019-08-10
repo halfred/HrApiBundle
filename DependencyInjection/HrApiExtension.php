@@ -20,7 +20,7 @@ class HrApiExtension extends Extension
 
 //         $this->addAnnotatedClassesToCompile([
 //        // you can define the fully qualified class names...
-//        'App\\Controller\\DefaultController',
+//        'Hr\ApiBundle\\Controller\\DefaultController',
 //        // ... but glob patterns are also supported:
 //        '**Bundle\\Controller\\',
 //

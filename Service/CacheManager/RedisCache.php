@@ -2,14 +2,14 @@
 
 namespace Hr\ApiBundle\Service\CacheManager;
 
-use App\Interfaces\CacheItemInterface;
+use Hr\ApiBundle\Interfaces\CacheItemInterface;
 use Psr\Cache\CacheItemInterface as PsrCacheItemInterface;
-use App\Interfaces\CacheManagerInterface;
+use Hr\ApiBundle\Interfaces\CacheManagerInterface;
 use Redis;
 
 /**
  * Class RedisCache
- * @package App\Service\CacheManager
+ * @package Hr\ApiBundle\Service\CacheManager
  */
 class RedisCache implements CacheManagerInterface
 {

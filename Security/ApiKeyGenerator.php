@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**
  * Class ApiKeyGenerator
- * @package App\Security
+ * @package Hr\ApiBundle\Security
  */
 class ApiKeyGenerator
 {
@@ -82,7 +82,7 @@ class ApiKeyGenerator
         $cachedUser     = null;
         $cachedApiKey   = null;
         $apiKey         = null;
-        $cacheKeyApiKey = 'auth:user:' . $username . ':apiKey';
+        $cacheKeyApiKey = 'auth-user-' . $username . '-apiKey';
         if ($this->cacheManager->hasItem($cacheKeyApiKey)) {
             $cachedApiKey = $this->cacheManager->getItem($cacheKeyApiKey);
             $apiKey       = $cachedApiKey->get();

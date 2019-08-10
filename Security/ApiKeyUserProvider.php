@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * Class ApiKeyUserProvider
- * @package App\Security
+ * @package Hr\ApiBundle\Security
  */
 class ApiKeyUserProvider implements UserProviderInterface
 {

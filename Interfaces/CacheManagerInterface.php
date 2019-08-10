@@ -6,7 +6,7 @@ use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Interface CacheManagerInterface
- * @package App\Interfaces
+ * @package Hr\ApiBundle\Interfaces
  */
 interface CacheManagerInterface extends CacheItemPoolInterface
 {

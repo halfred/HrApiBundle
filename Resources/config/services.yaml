@@ -18,4 +18,4 @@ services:
   Hr\ApiBundle\Service\CacheManager\RedisCache:
     public: true
   # alias for cache interface
-#  Psr\Cache\CacheItemPoolInterface: '@Hr\ApiBundle\Service\CacheManager\RedisCache'
+  Psr\Cache\CacheItemPoolInterface: '@Hr\ApiBundle\Service\CacheManager\RedisCache'

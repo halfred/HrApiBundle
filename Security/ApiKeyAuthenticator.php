@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Authentication\SimplePreAuthenticatorInterfa
 
 /**
  * Class ApiKeyAuthenticator
- * @package App\Security
+ * @package Hr\ApiBundle\Security
  */
 class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
 {

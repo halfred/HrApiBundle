@@ -6,7 +6,7 @@ use Psr\Cache\CacheItemInterface as PsrCacheItemInterface;
 
 /**
  * Interface CacheItemInterface
- * @package App\Interfaces
+ * @package Hr\ApiBundle\Interfaces
  */
 interface CacheItemInterface extends PsrCacheItemInterface
 {

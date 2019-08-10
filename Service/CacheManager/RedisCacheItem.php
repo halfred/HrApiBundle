@@ -2,11 +2,11 @@
 
 namespace Hr\ApiBundle\Service\CacheManager;
 
-use App\Interfaces\CacheItemInterface;
+use Hr\ApiBundle\Interfaces\CacheItemInterface;
 
 /**
  * Class RedisCacheItem
- * @package App\Service\CacheManager
+ * @package Hr\ApiBundle\Service\CacheManager
  */
 class RedisCacheItem implements CacheItemInterface
 {
