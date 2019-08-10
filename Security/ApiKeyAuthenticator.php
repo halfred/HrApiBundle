@@ -48,6 +48,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
         $this->entityManager       = $entityManager;
         $this->userPasswordEncoder = $userPasswordEncoder;
         $this->cacheManager        = $cacheManager;
+
     }
 
     /**
@@ -135,7 +136,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
         //get the User object from the username
         $user = $userProvider->loadUserByUsername($username);
 
-        if (empty($username)) {
+        if (empty($user)) {
             throw new CustomUserMessageAuthenticationException('invalid user');
         }
 
