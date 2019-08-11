@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="Hr\ApiBundle\Repository\UserRepository")
+ * @ORM\Table(name="authUser")
  */
 class User implements UserInterface
 {
@@ -41,6 +42,29 @@ class User implements UserInterface
      * @ORM\Column(type="array")
      */
     private $roles;
+
+    /**
+     * @var string
+     */
+    private $appScope;
+
+    /**
+     * @return string
+     */
+    public function getAppScope()
+    {
+        return $this->appScope;
+    }
+
+    /**
+     * @param string $appScope
+     */
+    public function setAppScope($appScope): void
+    {
+        /** @var UserOrganizer $appScope */
+        $appScope->unsetUser();
+        $this->appScope = $appScope;
+    }
 
     public function __construct()
     {

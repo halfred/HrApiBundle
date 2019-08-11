@@ -27,7 +27,7 @@ class SerializerBuilder
     protected function getNormalizers()
     {
         return [
-            new ObjectNormalizer(),
+            (new ObjectNormalizer())->setIgnoredAttributes(["__initializer__", "__cloner__","__isInitialized__"]),
         ];
     }
 

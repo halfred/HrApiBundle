@@ -36,7 +36,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
     protected $cacheManager;
 
     /**
-     * @param EntityManagerInterface       $entityManager
+     * @param EntityManagerInterface $entityManager
      * @param UserPasswordEncoderInterface $userPasswordEncoder
      * @param CacheItemPoolInterface $cacheManager
      */
@@ -44,10 +44,11 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
         EntityManagerInterface $entityManager,
         UserPasswordEncoderInterface $userPasswordEncoder,
         CacheItemPoolInterface $cacheManager
-    ) {
-        $this->entityManager       = $entityManager;
+    )
+    {
+        $this->entityManager = $entityManager;
         $this->userPasswordEncoder = $userPasswordEncoder;
-        $this->cacheManager        = $cacheManager;
+        $this->cacheManager = $cacheManager;
 
     }
 
@@ -64,11 +65,19 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
             throw new BadCredentialsException('apiKey field is missing in the header');
         }
 
-        return new PreAuthenticatedToken(
+        $appScope = $request->headers->get('appScope');
+        if (empty($appScope)) {
+            throw new BadCredentialsException('appScope field is missing in the header');
+        }
+
+        $preAuthenticatedToken = new PreAuthenticatedToken(
             '',
             $apiKey,
             $providerKey
         );
+        $preAuthenticatedToken->setAttribute('appScope', $appScope);
+
+        return $preAuthenticatedToken;
     }
 
     /**
@@ -85,7 +94,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
 
     /**
      * Check if the user exists and the password is correct, based on the Token
-     * @param TokenInterface        $token
+     * @param TokenInterface $token
      * @param UserProviderInterface $userProvider
      * @param                       $providerKey
      * @return PreAuthenticatedToken
@@ -94,22 +103,23 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
         TokenInterface $token,
         UserProviderInterface $userProvider,
         $providerKey
-    ): PreAuthenticatedToken {
+    ): PreAuthenticatedToken
+    {
         if (!$userProvider instanceof ApiKeyUserProvider) {
             throw new InvalidArgumentException(
                 'The user provider must be an instance of ApiKeyUserProvider (' . get_class($userProvider) . ' was given).'
             );
         }
 
-        $username         = null;
+        $username = null;
         $cacheKeyUsername = null;
-        $cachedApiKey     = null;
-        $apiKey           = $token->getCredentials();
+        $cachedApiKey = null;
+        $apiKey = $token->getCredentials();
         //check the username in the cache, based on the apiKey
         $cacheKeyUsername = 'auth:apiKey:' . $apiKey . ':username';
         if ($this->cacheManager->hasItem($cacheKeyUsername)) {
             $cachedUsername = $this->cacheManager->getItem($cacheKeyUsername);
-            $username       = $cachedUsername->get();
+            $username = $cachedUsername->get();
 
             //refresh cache
             $cachedUsername->expiresAfter(getenv('API_USER_SESSION_TTL'));
@@ -122,7 +132,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
         $cacheKeyApiKey = 'auth:user:' . $username . ':apiKey';
         //check the apiKey in the cache, based on the username
         if ($this->cacheManager->hasItem($cacheKeyApiKey)) {
-            $cachedApiKey      = $this->cacheManager->getItem($cacheKeyApiKey);
+            $cachedApiKey = $this->cacheManager->getItem($cacheKeyApiKey);
             $cachedApiKeyValue = $cachedApiKey->get();
 
             //refresh cache
@@ -133,8 +143,9 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
             throw new CustomUserMessageAuthenticationException('invalid apiKey');
         }
 
-        //get the User object from the username
-        $user = $userProvider->loadUserByUsername($username);
+        //get the User object from the username and app scope
+        $appScope = $token->getAttribute('appScope');
+        $user = $userProvider->loadUserByUsernameAndAppScope($username, $appScope);
 
         if (empty($user)) {
             throw new CustomUserMessageAuthenticationException('invalid user');
