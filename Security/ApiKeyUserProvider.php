@@ -4,13 +4,11 @@ namespace Hr\ApiBundle\Security;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Hr\ApiBundle\Entity\User as UserEntity;
-use Hr\ApiBundle\Entity\UserOrganizer;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use \Exception;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Class ApiKeyUserProvider
@@ -22,36 +20,31 @@ class ApiKeyUserProvider implements UserProviderInterface
      * @var EntityManagerInterface
      */
     protected $entityManager;
+    /**
+     * @var SerializerInterface The cache manager service
+     */
+    protected $serializer;
 
     /**
      * ApiKeyUserProvider constructor.
      * @param EntityManagerInterface $entityManager
      */
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, SerializerInterface $serializer)
     {
         $this->entityManager = $entityManager;
+        $this->serializer = $serializer;
     }
 
     /**
-     * Load user by username and app scope
-     * @param string $username
+     * Load user by encoded User and app scope
+     * @param string $encodedUser
+     * @param string $appScope
      * @return bool|User|UserInterface
      */
-    public function loadUserByUsernameAndAppScope(string $username, string $appScope)
+    public function createUserFromJson(string $encodedUser, string $appScope)
     {
-        switch ($appScope) {
-            case 'organizer':
-                $repository = $this->entityManager->getRepository(UserOrganizer::class);
-                /** @var UserOrganizer $userOrganizer */
-                $userOrganizer = $repository->findByUsername($username);
-                break;
-            default:
-                throw new Exception("appScope '$appScope' not handled");
-        }
-
-        $user = $userOrganizer->getUser();
-        /** @var UserEntity $user */
-        $user->setAppScope($userOrganizer);
+        $user = $this->serializer->deserialize($encodedUser, UserEntity::class, 'json');
+        $user->setAppScope($appScope);
 
         if (is_null($user)) {
             return false;
@@ -62,20 +55,12 @@ class ApiKeyUserProvider implements UserProviderInterface
 
     /**
      * Load user by username
-     * @param string $username
+     * @param string $encodedUser
      * @return bool|User|UserInterface
      */
-    public function loadUserByUsername($username)
+    public function loadUserByUsername($encodedUser)
     {
-        $repository = $this->entityManager->getRepository(UserEntity::class);
-        /** @var UserEntity $user */
-        $user = $repository->findOneBy(['username' => $username]);
-
-        if (is_null($user)) {
-            return false;
-        }
-
-        return $user;
+        return false;
     }
 
     /**

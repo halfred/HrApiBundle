@@ -2,8 +2,10 @@
 
 namespace Hr\ApiBundle\Entity;
 
+use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -16,6 +18,7 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Groups("user,admin")
      */
     private $id;
 
@@ -23,30 +26,57 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank()
      * @Assert\Email()
+     * @Groups("user,admin")
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank()
+     * @Groups("user,admin")
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=64)
      * @Assert\NotBlank()
+     * @Groups("admin")
      */
     private $password;
 
     /**
      * @ORM\Column(type="array")
+     * @Groups("admin")
      */
     private $roles;
 
     /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     * @Groups("admin")
+     */
+    private $lastApiKey;
+
+    /**
      * @var string
+     * @Groups("admin")
      */
     private $appScope;
+
+    /**
+     * @return mixed
+     */
+    public function getLastApiKey()
+    {
+        return $this->lastApiKey;
+    }
+
+    /**
+     * @param mixed $lastApiKey
+     */
+    public function setLastApiKey($lastApiKey): void
+    {
+        $this->lastApiKey = $lastApiKey;
+    }
 
     /**
      * @return string
@@ -61,14 +91,17 @@ class User implements UserInterface
      */
     public function setAppScope($appScope): void
     {
-        /** @var UserOrganizer $appScope */
-        $appScope->unsetUser();
         $this->appScope = $appScope;
     }
 
     public function __construct()
     {
         $this->roles = array('ROLE_USER');
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
     public function getId()
@@ -120,6 +153,11 @@ class User implements UserInterface
 
     public function eraseCredentials()
     {
+    }
+
+    public function setRoles(array $roles)
+    {
+        $this->roles = array_unique($roles);
     }
 
     public function addRoles(array $roles)

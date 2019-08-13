@@ -6,14 +6,10 @@ services:
 
   Hr\ApiBundle\Repository\UserRepository:
     tags: ['doctrine.repository_service']
-  Hr\ApiBundle\Repository\UserOrganizerRepository:
-    tags: ['doctrine.repository_service']
 
   # alias for cache interface
   Psr\Cache\CacheItemPoolInterface: '@Hr\ApiBundle\Service\CacheManager\RedisCache'
 
-  Hr\ApiBundle\Service\SerializerBuilder:
-    public: true
   Hr\ApiBundle\Security\ApiKeyAuthenticator:
     public: true
   Hr\ApiBundle\Security\ApiKeyGenerator:

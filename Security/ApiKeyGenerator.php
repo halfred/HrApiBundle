@@ -9,6 +9,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Serializer\SerializerInterface;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\expr;
 
 /**
  * Class ApiKeyGenerator
@@ -28,6 +30,10 @@ class ApiKeyGenerator
      * @var CacheManagerInterface The cache manager service
      */
     protected $cacheManager;
+    /**
+     * @var SerializerInterface The cache manager service
+     */
+    protected $serializer;
 
     /**
      * @param EntityManagerInterface $entityManager
@@ -37,11 +43,13 @@ class ApiKeyGenerator
     public function __construct(
         EntityManagerInterface $entityManager,
         UserPasswordEncoderInterface $userPasswordEncoder,
-        CacheItemPoolInterface $cacheManager
+        CacheItemPoolInterface $cacheManager,
+        SerializerInterface $serializer
     ) {
         $this->entityManager       = $entityManager;
         $this->userPasswordEncoder = $userPasswordEncoder;
         $this->cacheManager        = $cacheManager;
+        $this->serializer        = $serializer;
     }
 
     /**
@@ -82,33 +90,20 @@ class ApiKeyGenerator
         $cachedUser     = null;
         $cachedApiKey   = null;
         $apiKey         = null;
-        $cacheKeyApiKey = 'auth:user:' . $username . ':apiKey';
-        if ($this->cacheManager->hasItem($cacheKeyApiKey)) {
-            $cachedApiKey = $this->cacheManager->getItem($cacheKeyApiKey);
-            $apiKey       = $cachedApiKey->get();
-
-            $cacheKeyUsername = 'auth:apiKey:' . $apiKey . ':username';
-            if ($this->cacheManager->hasItem($cacheKeyUsername)) {
-                $cachedUsername = $this->cacheManager->getItem($cacheKeyUsername);
-            }
-        }
 
         //create the apiKey if the cache is empty for this user/apiKey
-        if (empty($cachedUsername) || empty($cachedApiKey)) {
-            $apiKey       = hash('sha1', $username . $password . date('YmdHis') . rand(1, 100));
-            $cachedApiKey = $this->cacheManager->createItem($cacheKeyApiKey);
-            $cachedApiKey->set($apiKey);
+        $apiKey       = hash('sha1', $username . $password . date('YmdHis') . rand(1, 100));
+        $cacheKeyApiKey = 'auth:apiKey:' . $apiKey . ':user';
+        $cachedUser = $this->cacheManager->createItem($cacheKeyApiKey);
 
-            $cacheKeyUsername = 'auth:apiKey:' . $apiKey . ':username';
-            $cachedUsername   = $this->cacheManager->createItem($cacheKeyUsername);
-            $cachedUsername->set($username);
-        }
+        $user->setLastApiKey($apiKey);
+        $serializedUser= $this->serializer->serialize($user, 'json');
+
+        $cachedUser->set($serializedUser);
 
         //in all cases, set/reset ttl countdown
-        $cachedUsername->expiresAfter(getenv('API_USER_SESSION_TTL'));
-        $this->cacheManager->save($cachedUsername);
-        $cachedApiKey->expiresAfter(getenv('API_USER_SESSION_TTL'));
-        $this->cacheManager->save($cachedApiKey);
+        $cachedUser->expiresAfter(getenv('API_USER_SESSION_TTL'));
+        $this->cacheManager->save($cachedUser);
 
         return $apiKey;
     }

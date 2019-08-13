@@ -2,7 +2,6 @@
 
 namespace Hr\ApiBundle\Controller;
 
-use Hr\ApiBundle\Service\SerializerBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

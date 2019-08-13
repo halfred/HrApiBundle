@@ -3,6 +3,7 @@
 namespace Hr\ApiBundle\Security;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use InvalidArgumentException;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,10 +12,9 @@ use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\SimplePreAuthenticatorInterface;
+
 
 /**
  * Class ApiKeyAuthenticator
@@ -49,7 +49,6 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
         $this->entityManager = $entityManager;
         $this->userPasswordEncoder = $userPasswordEncoder;
         $this->cacheManager = $cacheManager;
-
     }
 
     /**
@@ -62,12 +61,12 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
     {
         $apiKey = $request->headers->get('apiKey');
         if (empty($apiKey)) {
-            throw new BadCredentialsException('apiKey field is missing in the header');
+            throw new InvalidArgumentException('apiKey field is missing in the header');
         }
 
         $appScope = $request->headers->get('appScope');
         if (empty($appScope)) {
-            throw new BadCredentialsException('appScope field is missing in the header');
+            throw new InvalidArgumentException('appScope field is missing in the header');
         }
 
         $preAuthenticatedToken = new PreAuthenticatedToken(
@@ -96,8 +95,10 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
      * Check if the user exists and the password is correct, based on the Token
      * @param TokenInterface $token
      * @param UserProviderInterface $userProvider
-     * @param                       $providerKey
+     * @param mixed $providerKey
      * @return PreAuthenticatedToken
+     * @throws InvalidArgumentException
+     * @throws Exception
      */
     public function authenticateToken(
         TokenInterface $token,
@@ -115,40 +116,24 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
         $cacheKeyUsername = null;
         $cachedApiKey = null;
         $apiKey = $token->getCredentials();
-        //check the username in the cache, based on the apiKey
-        $cacheKeyUsername = 'auth:apiKey:' . $apiKey . ':username';
-        if ($this->cacheManager->hasItem($cacheKeyUsername)) {
-            $cachedUsername = $this->cacheManager->getItem($cacheKeyUsername);
-            $username = $cachedUsername->get();
-
-            //refresh cache
-            $cachedUsername->expiresAfter(getenv('API_USER_SESSION_TTL'));
-            $this->cacheManager->save($cachedUsername);
-        }
-        if (empty($username)) {
-            throw new CustomUserMessageAuthenticationException('invalid apiKey');
-        }
-
-        $cacheKeyApiKey = 'auth:user:' . $username . ':apiKey';
-        //check the apiKey in the cache, based on the username
+        //check the user in the cache, based on the apiKey
+        $cacheKeyApiKey = 'auth:apiKey:' . $apiKey . ':user';
         if ($this->cacheManager->hasItem($cacheKeyApiKey)) {
-            $cachedApiKey = $this->cacheManager->getItem($cacheKeyApiKey);
-            $cachedApiKeyValue = $cachedApiKey->get();
+            $cachedUser = $this->cacheManager->getItem($cacheKeyApiKey);
+            $encodedUser = $cachedUser->get();
+            $appScope = $token->getAttribute('appScope');
 
-            //refresh cache
-            $cachedApiKey->expiresAfter(getenv('API_USER_SESSION_TTL'));
-            $this->cacheManager->save($cachedApiKey);
-        }
-        if (empty($cachedApiKeyValue)) {
-            throw new CustomUserMessageAuthenticationException('invalid apiKey');
-        }
+            $user = $userProvider->createUserFromJson($encodedUser, $appScope);
 
-        //get the User object from the username and app scope
-        $appScope = $token->getAttribute('appScope');
-        $user = $userProvider->loadUserByUsernameAndAppScope($username, $appScope);
+            //refresh cache TTL
+            $cachedUser->expiresAfter(getenv('API_USER_SESSION_TTL'));
+            $this->cacheManager->save($cachedUser);
+        } else {
+            throw new InvalidArgumentException('invalid apiKey ' . $apiKey);
+        }
 
         if (empty($user)) {
-            throw new CustomUserMessageAuthenticationException('invalid user');
+            throw new Exception('invalid user');
         }
 
         return new PreAuthenticatedToken(

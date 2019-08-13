@@ -4,11 +4,11 @@ namespace Hr\ApiBundle\Controller;
 
 use Hr\ApiBundle\Entity\User;
 use Hr\ApiBundle\Repository\UserRepository;
-use Hr\ApiBundle\Service\SerializerBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 /**
@@ -19,18 +19,18 @@ abstract class AdminBaseController extends BaseController
 {
     /**
      * Get multiple users
-     * @param SerializerBuilder $serializerBuilder the serializer
+     * @param SerializerInterface $serializer the serializer
      * @return Response
      * @Route("/", name="user_get_multi", methods={"GET"})
      */
-    public function getMulti(SerializerBuilder $serializerBuilder)
+    public function getMulti(SerializerInterface $serializer)
     {
         $entityManager = $this->getDoctrine()->getManager();
         /** @var UserRepository $userRepository */
         $userRepository = $entityManager->getRepository(User::class);
         $users = $userRepository->findAll();
 
-        $response = $serializerBuilder->getSerializer()->serialize($users, 'json');
+        $response = $serializer->serialize($users, 'json');
         return new Response($response);
     }
 
@@ -41,15 +41,29 @@ abstract class AdminBaseController extends BaseController
      * @return JsonResponse
      * @Route("/{userId}", name="user_get_one", methods={"GET"})
      */
-    public function getOne(SerializerBuilder $serializerBuilder, int $userId)
+    public function getOne(SerializerInterface $serializer, int $userId)
     {
         $entityManager = $this->getDoctrine()->getManager();
         /** @var UserRepository $userRepository */
         $userRepository = $entityManager->getRepository(User::class);
         $user = $userRepository->find($userId);
 
-        $response = $serializerBuilder->getSerializer()->serialize($user, 'json');
+        $response = $serializer->serialize($user, 'json');
         return new Response($response);
+    }
+
+    /**
+     * delete by Id
+     * @param Request $request The http request
+     * @param int $id The  id
+     * @return JsonResponse
+     * @Route("/{id}", name="user_delete", methods={"delete"})
+     */
+    public function delete(Request $request, int $id)
+    {
+        return $this->json([
+            'message' => 'delete ' . $id,
+        ]);
     }
 
 //    /**
@@ -79,17 +93,5 @@ abstract class AdminBaseController extends BaseController
 //        ]);
 //    }
 
-    /**
-     * delete by Id
-     * @param Request $request The http request
-     * @param int $id The  id
-     * @return JsonResponse
-     * @Route("/{id}", name="user_delete", methods={"delete"})
-     */
-    public function delete(Request $request, int $id)
-    {
-        return $this->json([
-            'message' => 'delete ' . $id,
-        ]);
-    }
+
 }
