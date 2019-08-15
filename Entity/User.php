@@ -63,6 +63,13 @@ class User implements UserInterface
     private $appScope;
 
     /**
+     * contains de app scoped user (ex: UserOrganizer,...)
+     * @Groups("admin")
+     */
+    private $appUser;
+
+
+    /**
      * @return mixed
      */
     public function getLastApiKey()
@@ -165,4 +172,15 @@ class User implements UserInterface
         $this->roles = array_merge($this->roles, $roles);
         $this->roles = array_unique($this->roles);
     }
+
+    public function getAppUser()
+    {
+        return $this->appUser;
+    }
+
+    public function setAppUser($appUser)
+    {
+        $this->appUser = $appUser;
+    }
+
 }
