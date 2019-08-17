@@ -20,3 +20,5 @@ services:
     public: true
   Hr\ApiBundle\Service\JsonHelper:
     public: true
+  Hr\ApiBundle\Service\FormatHelper:
+    public: true
