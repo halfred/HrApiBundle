@@ -64,10 +64,12 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
             throw new InvalidArgumentException('apiKey field is missing in the header');
         }
 
-        $appScope = $request->headers->get('appScope');
-        if (empty($appScope)) {
-            throw new InvalidArgumentException('appScope field is missing in the header');
-        }
+        //TODO: remove appscope
+        $appScope='removeMe';
+//        $appScope = $request->headers->get('appScope');
+//        if (empty($appScope)) {
+//            throw new InvalidArgumentException('appScope field is missing in the header');
+//        }
 
         $preAuthenticatedToken = new PreAuthenticatedToken(
             '',
