@@ -37,10 +37,9 @@ class ApiKeyUserProvider implements UserProviderInterface
     /**
      * This must be overrode in App/Security/ApiKeyUserProviderXXXXXXXXXX
      * @param string $encodedUser
-     * @param string $appScope
      * @return bool|User|UserInterface
      */
-    public function createUserFromJson(string $encodedUser, string $appScope)
+    public function createUserFromJson(string $encodedUser)
     {
         return false;
     }

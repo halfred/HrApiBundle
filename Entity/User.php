@@ -18,7 +18,7 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Groups("user,admin")
+     * @Groups({"user","admin"})
      */
     private $id;
 
@@ -26,14 +26,14 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank()
      * @Assert\Email()
-     * @Groups("user,admin")
+     * @Groups({"user","admin"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank()
-     * @Groups("user,admin")
+     * @Groups({"user","admin"})
      */
     private $username;
 
@@ -57,12 +57,6 @@ class User implements UserInterface
     private $lastApiKey;
 
     /**
-     * @var string
-     * @Groups("admin")
-     */
-    private $appScope;
-
-    /**
      * contains de app scoped user (ex: UserOrganizer,...)
      * @Groups("admin")
      */
@@ -83,22 +77,6 @@ class User implements UserInterface
     public function setLastApiKey($lastApiKey): void
     {
         $this->lastApiKey = $lastApiKey;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAppScope()
-    {
-        return $this->appScope;
-    }
-
-    /**
-     * @param string $appScope
-     */
-    public function setAppScope($appScope): void
-    {
-        $this->appScope = $appScope;
     }
 
     public function __construct()

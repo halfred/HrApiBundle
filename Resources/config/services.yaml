@@ -22,3 +22,6 @@ services:
     public: true
   Hr\ApiBundle\Service\FormatHelper:
     public: true
+  Hr\ApiBundle\EventListener\ExceptionListener:
+    tags:
+      - { name: kernel.event_listener, event: kernel.exception }

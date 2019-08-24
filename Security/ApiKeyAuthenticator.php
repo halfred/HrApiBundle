@@ -64,19 +64,11 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
             throw new InvalidArgumentException('apiKey field is missing in the header');
         }
 
-        //TODO: remove appscope
-        $appScope='removeMe';
-//        $appScope = $request->headers->get('appScope');
-//        if (empty($appScope)) {
-//            throw new InvalidArgumentException('appScope field is missing in the header');
-//        }
-
         $preAuthenticatedToken = new PreAuthenticatedToken(
             '',
             $apiKey,
             $providerKey
         );
-        $preAuthenticatedToken->setAttribute('appScope', $appScope);
 
         return $preAuthenticatedToken;
     }
@@ -123,9 +115,8 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
         if ($this->cacheManager->hasItem($cacheKeyApiKey)) {
             $cachedUser = $this->cacheManager->getItem($cacheKeyApiKey);
             $encodedUser = $cachedUser->get();
-            $appScope = $token->getAttribute('appScope');
 
-            $user = $userProvider->createUserFromJson($encodedUser, $appScope);
+            $user = $userProvider->createUserFromJson($encodedUser);
 
             //refresh cache TTL
             $cachedUser->expiresAfter(getenv('API_USER_SESSION_TTL'));
