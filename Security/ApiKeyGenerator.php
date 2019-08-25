@@ -35,21 +35,20 @@ class ApiKeyGenerator
     protected $serializer;
 
     /**
-     * @param EntityManagerInterface $entityManager
+     * @param EntityManagerInterface       $entityManager
      * @param UserPasswordEncoderInterface $userPasswordEncoder
-     * @param CacheItemPoolInterface $cacheManager
+     * @param CacheItemPoolInterface       $cacheManager
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         UserPasswordEncoderInterface $userPasswordEncoder,
         CacheItemPoolInterface $cacheManager,
         SerializerInterface $serializer
-    )
-    {
-        $this->entityManager = $entityManager;
+    ) {
+        $this->entityManager       = $entityManager;
         $this->userPasswordEncoder = $userPasswordEncoder;
-        $this->cacheManager = $cacheManager;
-        $this->serializer = $serializer;
+        $this->cacheManager        = $cacheManager;
+        $this->serializer          = $serializer;
     }
 
     /**
@@ -88,14 +87,14 @@ class ApiKeyGenerator
 
         //check if the user already has an api key & email registered in the cache.
         //create and store it otherwise
-        $cachedUser = null;
+        $cachedUser   = null;
         $cachedApiKey = null;
-        $apiKey = null;
+        $apiKey       = null;
 
         //create the apiKey if the cache is empty for this user/apiKey
-        $apiKey = hash('sha1', $email . $password . date('YmdHis') . rand(1, 100));
+        $apiKey         = hash('sha1', $email . $password . date('YmdHis') . rand(1, 100));
         $cacheKeyApiKey = 'auth:apiKey:' . $apiKey . ':user';
-        $cachedUser = $this->cacheManager->createItem($cacheKeyApiKey);
+        $cachedUser     = $this->cacheManager->createItem($cacheKeyApiKey);
 
         $user->setLastApiKey($apiKey);
         $serializedUser = $this->serializer->serialize($user, 'json');
@@ -107,9 +106,12 @@ class ApiKeyGenerator
         $this->cacheManager->save($cachedUser);
 
         return [
-            'apiKey' => $apiKey,
-            'ttl' => intval(getenv('API_USER_SESSION_TTL')),
-            'user' => $this->serializer->serialize($user, 'json', ['groups' => 'user'])
+            'user'     => $user,
+            'response' => [
+                'apiKey' => $apiKey,
+                'ttl'    => intval(getenv('API_USER_SESSION_TTL')),
+                'user'   => $this->serializer->serialize($user, 'json', ['groups' => 'user']),
+            ],
         ];
     }
 }

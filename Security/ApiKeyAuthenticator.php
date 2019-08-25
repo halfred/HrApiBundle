@@ -122,7 +122,7 @@ class ApiKeyAuthenticator implements SimplePreAuthenticatorInterface
             $cachedUser->expiresAfter(getenv('API_USER_SESSION_TTL'));
             $this->cacheManager->save($cachedUser);
         } else {
-            throw new InvalidArgumentException('invalid apiKey ' . $apiKey);
+            throw new InvalidArgumentException('invalid apiKey');
         }
 
         if (empty($user)) {

@@ -18,11 +18,11 @@ class ExceptionListener
 //                'errorCode' => $exception->getCode(),
             ]);
 
-            $response = new Response($jsonException);
+            $response = new Response($jsonException,500,['Content-Type' => 'application/json']);
 
-            if ($exception instanceof BadCredentialsException) {
-                $response->setStatusCode(Response::HTTP_UNAUTHORIZED);
-            }
+//            if ($exception instanceof BadCredentialsException) {
+//                $response->setStatusCode(Response::HTTP_UNAUTHORIZED);
+//            }
             $event->setResponse($response);
         }
     }

@@ -30,15 +30,16 @@ abstract class BaseController extends Controller
     protected $defaultEntitySerializationGroup;
 
 
-    public function __construct(Security $security,
-                                EntityManagerInterface $entityManager,
-                                SerializerInterface $serializer,
-                                JsonHelper $jsonHelper)
-    {
-        $this->security = $security;
+    public function __construct(
+        Security $security,
+        EntityManagerInterface $entityManager,
+        SerializerInterface $serializer,
+        JsonHelper $jsonHelper
+    ) {
+        $this->security      = $security;
         $this->entityManager = $entityManager;
-        $this->serializer = $serializer;
-        $this->jsonHelper = $jsonHelper;
+        $this->serializer    = $serializer;
+        $this->jsonHelper    = $jsonHelper;
         $this->setDefaultEntitySerializationGroup();
     }
 
@@ -48,7 +49,14 @@ abstract class BaseController extends Controller
      */
     protected function returnSuccessObject($objectToReturn): Response
     {
-        $serializedObjectToReturn = $this->serializer->serialize($objectToReturn, 'json', ['groups' => [$this->defaultEntitySerializationGroup]]);
+        $serializedObjectToReturn = $this->serializer->serialize(
+            $objectToReturn,
+            'json',
+            [
+                'groups'           => [$this->defaultEntitySerializationGroup],
+                'skip_null_values' => true,
+            ]
+        );
         return new Response($serializedObjectToReturn, 200, ['Content-Type' => 'application/json']);
     }
 
@@ -57,8 +65,8 @@ abstract class BaseController extends Controller
      */
     protected function setDefaultEntitySerializationGroup(): void
     {
-        $defaultEntitySerializationGroup = explode('\\', get_class($this));
-        $defaultEntitySerializationGroup = lcfirst(array_pop($defaultEntitySerializationGroup));
+        $defaultEntitySerializationGroup       = explode('\\', get_class($this));
+        $defaultEntitySerializationGroup       = lcfirst(array_pop($defaultEntitySerializationGroup));
         $this->defaultEntitySerializationGroup = str_replace('Controller', '', $defaultEntitySerializationGroup);
     }
 
