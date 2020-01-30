@@ -132,5 +132,19 @@ abstract class BehatAbstractTest
         }
     }
     
+    /**
+     * @Then the response payload should contain
+     */
+    public function theResponsePayloadShouldContain(PyStringNode $string)
+    {
+        $responsePayload = json_decode($string->getRaw(), true);
+        $missingValues   = $this->genericFunctionHelper->getRecursiveDifference($responsePayload, $this->context['receivedPayload']);
+        
+        if (!empty($missingValues)) {
+            var_dump($missingValues);
+            throw new \Exception("The values above where expected");
+        }
+    }
+    
     
 }

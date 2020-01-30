@@ -26,9 +26,9 @@ class GenericFunctionHelper
                     $difference[$key] = $newDiff;
                 }
             } elseif (is_string($value) && !in_array($value, $array2)) {
-                $difference[$key] = $value . " is missing from the second array";
+                $difference[$key] = "Value " . $value . " is missing from the second array";
             } elseif (!is_numeric($key) && !array_key_exists($key, $array2)) {
-                $difference[$key] = "Missing from the second array";
+                $difference[$key] = "Key $key is missing from the second array";
             }
         }
         return $difference;
