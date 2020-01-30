@@ -13,11 +13,6 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class JsonHelper
 {
 
-    public function __construct()
-    {
-
-    }
-
     public function getValidJsonBody(Request $request, $mandatoryJsonKeys = []): array
     {
         $jsonBody = json_decode($request->getContent(), true);

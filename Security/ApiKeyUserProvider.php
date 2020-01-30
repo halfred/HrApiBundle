@@ -3,6 +3,7 @@
 namespace Hr\ApiBundle\Security;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Hr\ApiBundle\Entity\User as UserEntity;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\User;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -41,7 +42,14 @@ class ApiKeyUserProvider implements UserProviderInterface
      */
     public function createUserFromJson(string $encodedUser)
     {
-        return false;
+        /** @var UserEntity $user */
+        $user = $this->serializer->deserialize($encodedUser, UserEntity::class, 'json');
+    
+        if (is_null($user)) {
+            return false;
+        } else {
+            return $user;
+        }
     }
 
     /**
