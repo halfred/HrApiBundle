@@ -29,6 +29,7 @@ abstract class BehatAbstractTest
     /** @var string */
     protected $testBaseUrl;
     
+    const USER_ADMIN_USERNAME = 'admin';
     const USER_ADMIN_EMAIL    = 'admin@admin.com';
     const USER_ADMIN_PASSWORD = 'adminpwd';
     
@@ -130,8 +131,6 @@ abstract class BehatAbstractTest
             throw new \Exception("invalid status code : $expectedStatusCode != $receivedStatusCode");
         }
     }
-    
-
     
     
 }
