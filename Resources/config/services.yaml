@@ -22,7 +22,7 @@ services:
     public: true
   Hr\ApiBundle\Service\FormatHelper:
     public: true
-  Hr\ApiBundle\Service\BehatAbstractTest:
+  Hr\ApiBundle\Service\GenericFunctionHelper:
     public: true
   Hr\ApiBundle\EventListener\ExceptionListener:
     tags:
