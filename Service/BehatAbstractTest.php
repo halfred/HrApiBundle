@@ -30,7 +30,7 @@ abstract class BehatAbstractTest
     protected $testBaseUrl;
     
     const USER_ADMIN_USERNAME = 'admin';
-    const USER_ADMIN_EMAIL    = 'admin@admin.com';
+    const USER_ADMIN_EMAIL    = 'admin@admin.test';
     const USER_ADMIN_PASSWORD = 'adminpwd';
     
     /**
