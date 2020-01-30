@@ -131,21 +131,7 @@ abstract class BehatAbstractTest
         }
     }
     
-    /**
-     * @Then the response payload should contain
-     */
-    public function theResponsePayloadShouldContain(PyStringNode $string)
-    {
-        $responsePayload = json_decode($string->getRaw(), true);
-        $missingValues = $this->genericFunctionHelper->getRecursiveDifference($this->context['receivedPayload'], $responsePayload);
-        
-        var_dump($missingValues);
-    
-        $missingValues = $this->genericFunctionHelper->getRecursiveDifference($responsePayload, $this->context['receivedPayload']);
-        var_dump($missingValues);
-    
-        exit;
-    }
+
     
     
 }
