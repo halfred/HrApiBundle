@@ -4,7 +4,6 @@ namespace Hr\ApiBundle\Controller;
 
 use Hr\ApiBundle\Entity\User;
 use Hr\ApiBundle\Repository\UserRepository;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -28,12 +27,12 @@ abstract class AdminBaseController extends BaseController
         $entityManager = $this->getDoctrine()->getManager();
         /** @var UserRepository $userRepository */
         $userRepository = $entityManager->getRepository(User::class);
-        $users = $userRepository->findAll();
-
+        $users          = $userRepository->findAll();
+        
         $response = $serializer->serialize($users, 'json');
         return new Response($response, 200, ['Content-Type' => 'application/json']);
     }
-
+    
     /**
      * Get one user by id
      * @param Request $request The http request
@@ -46,12 +45,12 @@ abstract class AdminBaseController extends BaseController
         $entityManager = $this->getDoctrine()->getManager();
         /** @var UserRepository $userRepository */
         $userRepository = $entityManager->getRepository(User::class);
-        $user = $userRepository->find($userId);
-
+        $user           = $userRepository->find($userId);
+        
         $response = $serializer->serialize($user, 'json');
         return new Response($response, 200, ['Content-Type' => 'application/json']);
     }
-
+    
     /**
      * delete by Id
      * @param Request $request The http request
@@ -61,8 +60,18 @@ abstract class AdminBaseController extends BaseController
      */
     public function delete(Request $request, SerializerInterface $serializer, int $id)
     {
-        $response = $serializer->serialize($id, 'json');
+        $entityManager = $this->getDoctrine()->getManager();
+        /** @var UserRepository $userRepository */
+        $userRepository = $entityManager->getRepository(User::class);
+        $user           = $userRepository->find($id);
+        
+        $this->entityManager->remove($user);
+        $this->entityManager->flush();
+        
+        $response = $serializer->serialize([
+            "User $id deleted",
+        ], 'json');
         return new Response($response, 200, ['Content-Type' => 'application/json']);
     }
-
+    
 }
