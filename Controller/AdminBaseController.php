@@ -89,7 +89,7 @@ abstract class AdminBaseController extends BaseController
      * @return Response
      * @Route("/{id}", name="user_delete", methods={"delete"})
      */
-    public function delete(Request $request, SerializerInterface $serializer, int $userId): Response
+    public function delete(Request $request, int $userId): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
         /** @var UserRepository $userRepository */
@@ -100,12 +100,12 @@ abstract class AdminBaseController extends BaseController
             $this->entityManager->remove($user);
             $this->entityManager->flush();
             
-            $response = $serializer->serialize([
+            $response = $this->serializer->serialize([
                 'response' => 'ok',
                 'message'  => "User $userId deleted",
             ], 'json');
         } else {
-            $response = $serializer->serialize([
+            $response = $this->serializer->serialize([
                 'response' => 'nok',
                 'message'  => "User $userId not found",
             ], 'json');
