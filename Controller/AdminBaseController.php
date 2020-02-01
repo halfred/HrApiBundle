@@ -87,7 +87,7 @@ abstract class AdminBaseController extends BaseController
      * @param Request $request The http request
      * @param int $userId The id
      * @return Response
-     * @Route("/{id}", name="user_delete", methods={"delete"})
+     * @Route("/{userId}", name="user_delete", methods={"delete"})
      */
     public function delete(Request $request, int $userId): Response
     {
