@@ -54,6 +54,7 @@ abstract class AdminBaseController extends BaseController
     /**
      * @param Request $request
      * @param int $userId
+     * @return Response
      * @Route("/{userId}", name="user_update", methods={"PUT"})
      */
     public function update(Request $request, int $userId): Response
@@ -70,10 +71,7 @@ abstract class AdminBaseController extends BaseController
             $this->entityManager->persist($user);
             $this->entityManager->flush();
             
-            $response = $this->serializer->serialize([
-                'response' => 'ok',
-                'message'  => "User $userId deleted",
-            ], 'json');
+            $response = $this->serializer->serialize($user, 'json');
         } else {
             $response = $this->serializer->serialize([
                 'response' => 'nok',
@@ -81,7 +79,6 @@ abstract class AdminBaseController extends BaseController
             ], 'json');
         }
         
-        $response = $this->serializer->serialize($user, 'json');
         return new Response($response, 200, ['Content-Type' => 'application/json']);
     }
     
