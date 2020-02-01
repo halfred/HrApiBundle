@@ -22,7 +22,7 @@ abstract class AdminBaseController extends BaseController
      * @return Response
      * @Route("/", name="user_get_multi", methods={"GET"})
      */
-    public function getMulti(SerializerInterface $serializer)
+    public function getMulti(SerializerInterface $serializer): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
         /** @var UserRepository $userRepository */
@@ -52,25 +52,68 @@ abstract class AdminBaseController extends BaseController
     }
     
     /**
-     * delete by Id
-     * @param Request $request The http request
-     * @param int $id The  id
-     * @return Response
-     * @Route("/{id}", name="user_delete", methods={"delete"})
+     * @param Request $request
+     * @param int $userId
+     * @Route("/{userId}", name="user_update", methods={"PUT"})
      */
-    public function delete(Request $request, SerializerInterface $serializer, int $id)
+    public function update(Request $request, int $userId): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
         /** @var UserRepository $userRepository */
         $userRepository = $entityManager->getRepository(User::class);
-        $user           = $userRepository->find($id);
+        $user           = $userRepository->find($userId);
         
-        $this->entityManager->remove($user);
-        $this->entityManager->flush();
+        if (!empty($user)) {
+            $jsonBody = $this->jsonHelper->getValidJsonBody($request);
+            $user     = $this->serializer->denormalize($jsonBody, User::class, 'json', ['object_to_populate' => $user]);
+            
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+            
+            $response = $this->serializer->serialize([
+                'response' => 'ok',
+                'message'  => "User $userId deleted",
+            ], 'json');
+        } else {
+            $response = $this->serializer->serialize([
+                'response' => 'nok',
+                'message'  => "User $userId not found",
+            ], 'json');
+        }
         
-        $response = $serializer->serialize([
-            "User $id deleted",
-        ], 'json');
+        $response = $this->serializer->serialize($user, 'json');
+        return new Response($response, 200, ['Content-Type' => 'application/json']);
+    }
+    
+    /**
+     * delete by Id
+     * @param Request $request The http request
+     * @param int $userId The id
+     * @return Response
+     * @Route("/{id}", name="user_delete", methods={"delete"})
+     */
+    public function delete(Request $request, SerializerInterface $serializer, int $userId): Response
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        /** @var UserRepository $userRepository */
+        $userRepository = $entityManager->getRepository(User::class);
+        $user           = $userRepository->find($userId);
+        
+        if (!empty($user)) {
+            $this->entityManager->remove($user);
+            $this->entityManager->flush();
+            
+            $response = $serializer->serialize([
+                'response' => 'ok',
+                'message'  => "User $userId deleted",
+            ], 'json');
+        } else {
+            $response = $serializer->serialize([
+                'response' => 'nok',
+                'message'  => "User $userId not found",
+            ], 'json');
+        }
+        
         return new Response($response, 200, ['Content-Type' => 'application/json']);
     }
     
